@@ -7,4 +7,4 @@ This folder comprises basic Azure Terraform deployments and modules for re-usabi
 # azure_dbw
 This folder contains notebooks and other configuration files for use with and in an Azure Databricks Workspace (shortend to dbw).
 # Useful Links
-**[Microsoft Naming Convention](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations)
+[Microsoft Naming Convention](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations)
