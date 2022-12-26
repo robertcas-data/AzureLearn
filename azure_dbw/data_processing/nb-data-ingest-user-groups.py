@@ -1,3 +1,4 @@
+# Databricks notebook source
 # Generate a list with users and corresponding groups
 
 from pyspark.sql import functions as F
