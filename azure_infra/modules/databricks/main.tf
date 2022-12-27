@@ -41,7 +41,7 @@ resource "azurerm_databricks_workspace" "adb-ws" {
   resource_group_name         = azurerm_resource_group.rg-adb.name
   location                    = azurerm_resource_group.rg-adb.location
   sku                         = "premium"
-  managed_resource_group_name = "adb-ws-${var.project}-${var.environment}-managed"
+  managed_resource_group_name = "rg-${var.project}-databricks-${var.environment}-managed"
   tags                        = local.tags
 }
 
