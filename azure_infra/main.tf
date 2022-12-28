@@ -13,6 +13,12 @@ provider "azurerm" {
   features {}
 }
 
+# local variables
+
+# import required data objects
+data "azurerm_client_config" "current" {
+}
+
 # Create a resource group
 resource "azurerm_resource_group" "allstorage" {
   name     = "rg-dev-allstorage"
@@ -34,4 +40,22 @@ resource "azurerm_storage_account" "phone-backup" {
   tags = {
     environment = "private"
   }
+}
+
+# Create Databricks Workspace and Storage
+module "adb-learn" {
+  source = "./modules/databricks"
+  count = var.deploy-databricks == true ? 1 : 0
+  project = var.project
+  environment = var.environment
+  region = var.region
+}
+
+# Create Synapse Workspace, Storage and Keyvault
+module "synapse-learn" {
+  source = "./modules/synapse"
+  count = var.deploy-synapse == true ? 1 : 0
+  project = var.project
+  environment = var.environment
+  region = var.region
 }
