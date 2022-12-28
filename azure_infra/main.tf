@@ -45,6 +45,16 @@ resource "azurerm_storage_account" "phone-backup" {
 # Create Databricks Workspace and Storage
 module "adb-learn" {
   source = "./modules/databricks"
+  count = var.deploy-databricks == true ? 1 : 0
+  project = var.project
+  environment = var.environment
+  region = var.region
+}
+
+# Create Synapse Workspace, Storage and Keyvault
+module "synapse-learn" {
+  source = "./modules/synapse"
+  count = var.deploy-synapse == true ? 1 : 0
   project = var.project
   environment = var.environment
   region = var.region

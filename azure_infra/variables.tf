@@ -13,3 +13,14 @@ variable "environment" {
   type = string
   default = "dev"
 }
+
+# dynamic deployment
+variable "deploy-databricks"{
+  type = bool
+  default = true
+}
+
+variable "deploy-synapse"{
+  type = bool
+  default = true
+}
