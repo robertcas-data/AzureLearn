@@ -18,6 +18,14 @@ locals {
 data "azurerm_client_config" "current" {
 }
 
+data "azurerm_synapse_workspace" "synapse-ws" {
+  name                = "synapse-ws-${var.project}-${var.environment}"
+  resource_group_name = "rg-synapse-${var.project}-${var.environment}"
+}
+
+data "azurerm_subscription" "primary" {
+}
+
 # synapse resource group
 resource "azurerm_resource_group" "rg-synapse" {
   name     = "rg-synapse-${var.project}-${var.environment}"
@@ -45,7 +53,7 @@ resource "azurerm_storage_data_lake_gen2_filesystem" "adls-fs-synapse" {
 }
 
 resource "azurerm_synapse_workspace" "synapse-ws" {
-  name                                 =  "synapse-ws-${var.project}-${var.environment}"
+  name                                 = "synapse-ws-${var.project}-${var.environment}"
   resource_group_name                  = azurerm_resource_group.rg-synapse.name
   location                             = azurerm_resource_group.rg-synapse.location
   storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.adls-fs-synapse.id
@@ -70,4 +78,10 @@ resource "azurerm_synapse_firewall_rule" "synapse-fw" {
   synapse_workspace_id = azurerm_synapse_workspace.synapse-ws.id
   start_ip_address     = "0.0.0.0"
   end_ip_address       = "255.255.255.255"
+}
+
+resource "azurerm_role_assignment" "synapse-role-assignment" {
+  scope                = data.azurerm_subscription.primary.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = data.azurerm_synapse_workspace.synapse-ws.identity[0].principal_id
 }
