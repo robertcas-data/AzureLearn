@@ -70,6 +70,13 @@ resource "azurerm_synapse_workspace" "synapse-ws" {
     type = "SystemAssigned"
   }
 
+  github_repo {
+    account_name    = "robertcas-data"
+    branch_name     = "dev"
+    repository_name = "AzureLearn"
+    root_folder     = "/azure_synapse/"
+  }
+
   tags = local.tags
 }
 
@@ -84,4 +91,18 @@ resource "azurerm_role_assignment" "synapse-role-assignment" {
   scope                = data.azurerm_subscription.primary.id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = data.azurerm_synapse_workspace.synapse-ws.identity[0].principal_id
+}
+
+resource "azurerm_synapse_spark_pool" "sp-smallest" {
+  name                 = "spsmallest"
+  synapse_workspace_id = azurerm_synapse_workspace.synapse-ws.id
+  node_size_family     = "MemoryOptimized"
+  node_size            = "Small"
+  node_count           = 3
+
+  auto_pause {
+    delay_in_minutes = 10
+  }
+
+  tags = local.tags
 }

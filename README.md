@@ -7,6 +7,6 @@ Code related to working with Azure Resources and Data Services. For an overview 
 This folder comprises basic Azure Terraform deployments and modules for re-usability.
 
 # databricks
-This folder contains notebooks and other configuration files for use with and in an Azure Databricks Workspace (shortend to dbw).
+This folder contains notebooks and other configuration files for use with and in an Azure Databricks Workspace.
 # Useful Links
-**[Microsoft Naming Convention](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations)
+[Microsoft Naming Convention](https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/resource-abbreviations)
