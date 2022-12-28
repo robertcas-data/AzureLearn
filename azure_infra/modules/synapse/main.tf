@@ -24,57 +24,6 @@ resource "azurerm_resource_group" "rg-synapse" {
   location = var.region
 }
 
-resource "azurerm_key_vault" "kv-synapse" {
-  name                       = "kv-${var.project}${var.environment}"
-  location                   = azurerm_resource_group.rg-synapse.location
-  resource_group_name        = azurerm_resource_group.rg-synapse.name
-  tenant_id                  = data.azurerm_client_config.current.tenant_id
-  sku_name                   = "premium"
-  soft_delete_retention_days = 7
-
-  access_policy {
-    tenant_id = data.azurerm_client_config.current.tenant_id
-    object_id = "7bfba0b6-1452-48c5-a926-b9f8dfb131ac" #bugged: data.azurerm_client_config.current.object_id
-
-    key_permissions = [
-      "Create",
-      "Get",
-    ]
-
-    secret_permissions = [
-      "Set",
-      "Get",
-      "Delete",
-      "Purge",
-      "Recover"
-    ]
-  }
-}
-
-# (re-)create secret from local file when first executed
-resource "azurerm_key_vault_secret" "kv-secret" {
-  name         = "synapse-sqladminuser-${var.project}-${var.environment}"
-  value        = file("./.secrets/synapse-sql-admin.txt")
-  key_vault_id = azurerm_key_vault.kv-synapse.id
-}
-
-# otherwise import kv secret
-data "azurerm_key_vault" "data-kv" {
-  name                = "kv-${var.project}${var.environment}"
-  resource_group_name = "rg-synapse-${var.project}-${var.environment}"
-  depends_on = [
-    azurerm_key_vault_secret.kv-secret
-  ]
-}
-
-data "azurerm_key_vault_secret" "data-kv-secret" {
-  name         = "synapse-sqladminuser-${var.project}-${var.environment}"
-  key_vault_id = data.azurerm_key_vault.data-kv.id
-  depends_on = [
-    azurerm_key_vault_secret.kv-secret
-  ]
-}
-
 resource "azurerm_storage_account" "lakehouse" {
   name                     = "sahr${var.project}syn${var.environment}"
   resource_group_name      = azurerm_resource_group.rg-synapse.name
@@ -101,7 +50,7 @@ resource "azurerm_synapse_workspace" "synapse-ws" {
   location                             = azurerm_resource_group.rg-synapse.location
   storage_data_lake_gen2_filesystem_id = azurerm_storage_data_lake_gen2_filesystem.adls-fs-synapse.id
   sql_administrator_login              = "sqladminuser"
-  sql_administrator_login_password     = data.azurerm_key_vault_secret.data-kv-secret.value
+  sql_administrator_login_password     = file("./.secrets/synapse-sql-admin.txt") #data.azurerm_key_vault_secret.data-kv-secret.value
 
   aad_admin {
     login     = "AzureAD Admin"
@@ -114,4 +63,11 @@ resource "azurerm_synapse_workspace" "synapse-ws" {
   }
 
   tags = local.tags
+}
+
+resource "azurerm_synapse_firewall_rule" "synapse-fw" {
+  name                 = "AllowAll"
+  synapse_workspace_id = azurerm_synapse_workspace.synapse-ws.id
+  start_ip_address     = "0.0.0.0"
+  end_ip_address       = "255.255.255.255"
 }
