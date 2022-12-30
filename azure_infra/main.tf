@@ -51,11 +51,21 @@ module "adb-learn" {
   region = var.region
 }
 
-# Create Synapse Workspace, Storage and Keyvault
+# Create Synapse Workspace, Storage and later Keyvault
 module "synapse-learn" {
   source = "./modules/synapse"
   count = var.deploy-synapse == true ? 1 : 0
   project = var.project
+  environment = var.environment
+  region = var.region
+}
+
+# Create Azure Data Factory
+module "adf-learn" {
+  source = "./modules/datafactory"
+  count = var.deploy-datafactory == true ? 1 : 0
+  project = var.project
+  storage-name-short = "adf"
   environment = var.environment
   region = var.region
 }

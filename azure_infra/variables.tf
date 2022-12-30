@@ -24,3 +24,8 @@ variable "deploy-synapse"{
   type = bool
   default = true
 }
+
+variable "deploy-datafactory"{
+  type = bool
+  default = true
+}
