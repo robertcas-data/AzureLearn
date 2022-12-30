@@ -20,7 +20,7 @@ data "azurerm_client_config" "current" {
 
 data "azurerm_synapse_workspace" "synapse-ws" {
   name                = "synapse-ws-${var.project}-${var.environment}"
-  resource_group_name = "rg-synapse-${var.project}-${var.environment}"
+  resource_group_name = "rg-${var.project}-synapse-${var.environment}"
 }
 
 data "azurerm_subscription" "primary" {
