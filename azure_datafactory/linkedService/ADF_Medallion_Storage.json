@@ -1,0 +1,10 @@
+{
+	"name": "ADF_Medallion_Storage",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobFS",
+		"typeProperties": {
+			"url": "https://sahrazurelearnadfdev.dfs.core.windows.net/"
+		}
+	}
+}
