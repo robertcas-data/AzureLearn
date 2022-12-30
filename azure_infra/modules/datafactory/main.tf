@@ -21,6 +21,9 @@ locals {
 data "azurerm_client_config" "current" {
 }
 
+data "azurerm_subscription" "primary" {
+}
+
 # datafactory resource group
 resource "azurerm_resource_group" "rg-adf" {
   name     = "rg-${var.project}-datafactory-${var.environment}"
@@ -32,7 +35,9 @@ resource "azurerm_data_factory" "adf" {
   name                = "adf-${var.project}-${var.environment}"
   location            = azurerm_resource_group.rg-adf.location
   resource_group_name = azurerm_resource_group.rg-adf.name
-
+  identity {
+    type = "SystemAssigned"
+  }
   github_configuration {
     account_name    = "robertcas-data"
     branch_name     = "dev"
@@ -52,23 +57,22 @@ module "medallion-storage" {
   resource-group = azurerm_resource_group.rg-adf.name
 }
 
-resource "azurerm_data_factory_linked_service_data_lake_storage_gen2" "link-bronze" {
-  name                  = "bronze"
-  data_factory_id       = azurerm_data_factory.adf.id
-  use_managed_identity  = true
-  url                   = "https://sahr${var.project}${var.storage-name-short}${var.environment}.blob.core.windows.net/bronze"
+# link containers
+
+data "azurerm_storage_account" "med-storage" {
+  name                = "sahr${var.project}${var.storage-name-short}${var.environment}"
+  resource_group_name = azurerm_resource_group.rg-adf.name
 }
 
-resource "azurerm_data_factory_linked_service_data_lake_storage_gen2" "link-silver" {
-  name                  = "silver"
-  data_factory_id       = azurerm_data_factory.adf.id
-  use_managed_identity  = true
-  url                   = "https://sahr${var.project}${var.storage-name-short}${var.environment}.blob.core.windows.net/silver"
+resource "azurerm_role_assignment" "synapse-role-assignment" {
+  scope                = data.azurerm_storage_account.med-storage.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_data_factory.adf.identity[0].principal_id
 }
 
-resource "azurerm_data_factory_linked_service_data_lake_storage_gen2" "link-gold" {
-  name                  = "gold"
+resource "azurerm_data_factory_linked_service_data_lake_storage_gen2" "link-adf" {
+  name                  = "lin_sahr${var.project}${var.storage-name-short}${var.environment}"
   data_factory_id       = azurerm_data_factory.adf.id
   use_managed_identity  = true
-  url                   = "https://sahr${var.project}${var.storage-name-short}${var.environment}.blob.core.windows.net/gold"
+  url                   = "https://sahr${var.project}${var.storage-name-short}${var.environment}.dfs.core.windows.net/"
 }
