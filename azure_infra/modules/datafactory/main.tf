@@ -76,3 +76,17 @@ resource "azurerm_data_factory_linked_service_data_lake_storage_gen2" "link-adf"
   use_managed_identity  = true
   url                   = "https://sahr${var.project}${var.storage-name-short}${var.environment}.dfs.core.windows.net/"
 }
+
+# # push custom scrape-pv-prices to adls gen2 container
+data "azurerm_storage_container" "meta-container" {
+  name                 = "meta"
+  storage_account_name = "sahr${var.project}${var.storage-name-short}${var.environment}"
+}
+
+resource "azurerm_storage_blob" "push-scrape-pv-prices" {
+  name                   = "scripts/python/scrape-pv-prices.py"
+  storage_account_name   = data.azurerm_storage_account.med-storage.name
+  storage_container_name = data.azurerm_storage_container.meta-container.name
+  type                   = "Block"
+  source                 = "C:/Git/AzureLearn/ee_code/scrape-pv-prices.py"
+}

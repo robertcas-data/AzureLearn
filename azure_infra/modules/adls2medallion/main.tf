@@ -57,3 +57,9 @@ resource "azurerm_storage_container" "gold" {
   storage_account_name  = azurerm_storage_account.medallion.name
   container_access_type = "private"
 }
+
+resource "azurerm_storage_container" "meta" {
+  name                  = "meta"
+  storage_account_name  = azurerm_storage_account.medallion.name
+  container_access_type = "private"
+}

@@ -31,5 +31,7 @@ override.tf.json
 # ignore locks
 *.lock.hcl
 
-# Ignore Secrets
+# Ignore Secrets and local data
 **/.secrets/*
+**.local/*
+**/.local/*
