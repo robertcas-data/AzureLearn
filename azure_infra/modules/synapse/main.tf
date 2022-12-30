@@ -18,11 +18,6 @@ locals {
 data "azurerm_client_config" "current" {
 }
 
-data "azurerm_synapse_workspace" "synapse-ws" {
-  name                = "synapse-ws-${var.project}-${var.environment}"
-  resource_group_name = "rg-${var.project}-synapse-${var.environment}"
-}
-
 data "azurerm_subscription" "primary" {
 }
 
@@ -90,7 +85,7 @@ resource "azurerm_synapse_firewall_rule" "synapse-fw" {
 resource "azurerm_role_assignment" "synapse-role-assignment" {
   scope                = data.azurerm_subscription.primary.id
   role_definition_name = "Storage Blob Data Contributor"
-  principal_id         = data.azurerm_synapse_workspace.synapse-ws.identity[0].principal_id
+  principal_id         = azurerm_synapse_workspace.synapse-ws.identity[0].principal_id
 }
 
 resource "azurerm_synapse_spark_pool" "sp-smallest" {

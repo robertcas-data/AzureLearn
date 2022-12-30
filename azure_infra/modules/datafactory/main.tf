@@ -8,6 +8,9 @@ variable "environment" {
 variable "region" {
 }
 
+variable "storage-name-short" {
+}
+
 locals {
   tags = {
     environment = var.environment
@@ -37,4 +40,35 @@ resource "azurerm_data_factory" "adf" {
     repository_name = "AzureLearn"
     root_folder     = "/azure_datafactory/"
   }
+}
+
+# create adls2 with medallion architecture
+module "medallion-storage" {
+  source = "../adls2medallion"
+  project = var.project
+  storage-name-short = var.storage-name-short
+  environment = var.environment
+  region = var.region
+  resource-group = azurerm_resource_group.rg-adf.name
+}
+
+resource "azurerm_data_factory_linked_service_data_lake_storage_gen2" "link-bronze" {
+  name                  = "bronze"
+  data_factory_id       = azurerm_data_factory.adf.id
+  use_managed_identity  = true
+  url                   = "https://sahr${var.project}${var.storage-name-short}${var.environment}.blob.core.windows.net/bronze"
+}
+
+resource "azurerm_data_factory_linked_service_data_lake_storage_gen2" "link-silver" {
+  name                  = "silver"
+  data_factory_id       = azurerm_data_factory.adf.id
+  use_managed_identity  = true
+  url                   = "https://sahr${var.project}${var.storage-name-short}${var.environment}.blob.core.windows.net/silver"
+}
+
+resource "azurerm_data_factory_linked_service_data_lake_storage_gen2" "link-gold" {
+  name                  = "gold"
+  data_factory_id       = azurerm_data_factory.adf.id
+  use_managed_identity  = true
+  url                   = "https://sahr${var.project}${var.storage-name-short}${var.environment}.blob.core.windows.net/gold"
 }
