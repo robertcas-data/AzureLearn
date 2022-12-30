@@ -90,3 +90,50 @@ resource "azurerm_storage_blob" "push-scrape-pv-prices" {
   type                   = "Block"
   source                 = "C:/Git/AzureLearn/ee_code/scrape-pv-prices.py"
 }
+
+resource "azurerm_batch_account" "adf-batch" {
+  name                 = "ba${var.project}${var.environment}"
+  resource_group_name  = azurerm_resource_group.rg-adf.name
+  location             = azurerm_resource_group.rg-adf.location
+  pool_allocation_mode = "BatchService"
+  storage_account_id   = data.azurerm_storage_account.med-storage.id
+
+  tags = local.tags
+}
+
+# primary access key for batch account
+#azurerm_batch_account.adf-batch.primary_access_key
+resource "azurerm_batch_pool" "example" {
+  name                = "custom-activity-pool"
+  resource_group_name = azurerm_resource_group.rg-adf.name
+  account_name        = azurerm_batch_account.adf-batch.name
+  vm_size             = "Basic_A1"
+  node_agent_sku_id   = "batch.node.ubuntu 20.04"
+
+  fixed_scale {
+    target_dedicated_nodes = 1
+  }
+
+  storage_image_reference {
+    publisher = "microsoft-azure-batch"
+    offer     = "ubuntu-server-container"
+    sku       = "20-04-lts"
+    version   = "latest"
+  }
+    start_task {
+    command_line       = "pip install azure-storage-blob pandas bs4 requests lxml"
+    task_retry_maximum = 1
+    wait_for_success   = true
+
+    common_environment_properties = {
+      env = "TEST"
+    }
+
+    user_identity {
+      auto_user {
+        elevation_level = "Admin"
+        scope           = "Task"
+      }
+    }
+  }
+}
