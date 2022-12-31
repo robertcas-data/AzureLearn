@@ -1,0 +1,37 @@
+{
+	"name": "scrape_pv_prices",
+	"properties": {
+		"activities": [
+			{
+				"name": "python-scrape-pv",
+				"type": "Custom",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"command": "python scrape-pv-prices10.py",
+					"resourceLinkedService": {
+						"referenceName": "ADF_Medallion_Storage",
+						"type": "LinkedServiceReference"
+					},
+					"folderPath": "meta/scripts/python",
+					"referenceObjects": {
+						"linkedServices": [],
+						"datasets": []
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "ADF_Batch_Acc",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"annotations": []
+	}
+}

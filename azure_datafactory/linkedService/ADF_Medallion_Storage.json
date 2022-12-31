@@ -1,0 +1,11 @@
+{
+	"name": "ADF_Medallion_Storage",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBlobStorage",
+		"typeProperties": {
+			"serviceEndpoint": "https://sahrazurelearnadfdev.blob.core.windows.net/",
+			"accountKind": "StorageV2"
+		}
+	}
+}

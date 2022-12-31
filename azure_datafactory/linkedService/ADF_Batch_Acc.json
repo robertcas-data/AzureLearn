@@ -1,0 +1,16 @@
+{
+	"name": "ADF_Batch_Acc",
+	"properties": {
+		"annotations": [],
+		"type": "AzureBatch",
+		"typeProperties": {
+			"batchUri": "https://baazurelearndev.westeurope.batch.azure.com/",
+			"poolName": "custom-activity-pool",
+			"accountName": "baazurelearndev",
+			"linkedServiceName": {
+				"referenceName": "ADF_Medallion_Storage",
+				"type": "LinkedServiceReference"
+			}
+		}
+	}
+}
