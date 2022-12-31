@@ -102,7 +102,7 @@ resource "azurerm_batch_account" "adf-batch" {
 
 # primary access key for batch account
 #azurerm_batch_account.adf-batch.primary_access_key
-resource "azurerm_batch_pool" "example" {
+resource "azurerm_batch_pool" "batch-pool" {
   name                = "custom-activity-pool"
   resource_group_name = azurerm_resource_group.rg-adf.name
   account_name        = azurerm_batch_account.adf-batch.name

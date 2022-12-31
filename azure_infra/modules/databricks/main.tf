@@ -1,3 +1,16 @@
+terraform {
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "=3.37.0"
+    }
+    databricks = {
+      source  = "databricks/databricks"
+      version = "=1.7.0"
+    }
+  }
+}
+
 # variables passed by module call
 variable "project" {
 }
@@ -63,6 +76,23 @@ resource "azurerm_role_assignment" "synapse-role-assignment" {
   principal_id         = azurerm_databricks_access_connector.adb-con.identity[0].principal_id
 }
 
+
+# add smallest cluster
+# data "databricks_node_type" "smallest" {
+#   local_disk = true
+# }
+
+# resource "databricks_cluster" "adb-cluster" {
+#   cluster_name            = "adb-cluster-smallest"
+#   spark_version           = "3.3.0"
+#   node_type_id            = data.databricks_node_type.smallest.id
+#   autotermination_minutes = 10
+#   data_security_mode      = "USER_ISOLATION"
+#   num_workers = 1
+
+# }
+
+# declare outputs
 output "databricks_host" {
   value = "https://${azurerm_databricks_workspace.adb-ws.workspace_url}/"
 }
