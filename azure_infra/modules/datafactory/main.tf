@@ -96,8 +96,6 @@ resource "azurerm_batch_account" "adf-batch" {
   resource_group_name  = azurerm_resource_group.rg-adf.name
   location             = azurerm_resource_group.rg-adf.location
   pool_allocation_mode = "BatchService"
-  storage_account_id   = data.azurerm_storage_account.med-storage.id
-  storage_account_authentication_mode = "BatchAccountManagedIdentity"
 
   tags = local.tags
 }
