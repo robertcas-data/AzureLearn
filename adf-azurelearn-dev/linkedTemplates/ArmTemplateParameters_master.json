@@ -1,0 +1,30 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adf-azurelearn-dev"
+		},
+		"lin_sahrazurelearnadfdev_properties_typeProperties_url": {
+			"value": "https://sahrazurelearnadfdev.dfs.core.windows.net/"
+		},
+		"ADF_Medallion_Storage_properties_typeProperties_serviceEndpoint": {
+			"value": "https://sahrazurelearnadfdev.blob.core.windows.net/"
+		},
+		"ADF_Batch_Acc_properties_typeProperties_batchUri": {
+			"value": "https://baazurelearndev.westeurope.batch.azure.com/"
+		},
+		"ADF_Batch_Acc_properties_typeProperties_poolName": {
+			"value": "custom-activity-pool"
+		},
+		"ADF_Batch_Acc_properties_typeProperties_accountName": {
+			"value": "baazurelearndev"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}

@@ -1,0 +1,77 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-azurelearn-dev"
+		},
+		"lin_sahrazurelearnadfdev_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://sahrazurelearnadfdev.dfs.core.windows.net/"
+		},
+		"ADF_Medallion_Storage_properties_typeProperties_serviceEndpoint": {
+			"type": "string",
+			"defaultValue": "https://sahrazurelearnadfdev.blob.core.windows.net/"
+		},
+		"ADF_Batch_Acc_properties_typeProperties_batchUri": {
+			"type": "string",
+			"defaultValue": "https://baazurelearndev.westeurope.batch.azure.com/"
+		},
+		"ADF_Batch_Acc_properties_typeProperties_poolName": {
+			"type": "string",
+			"defaultValue": "custom-activity-pool"
+		},
+		"ADF_Batch_Acc_properties_typeProperties_accountName": {
+			"type": "string",
+			"defaultValue": "baazurelearndev"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "adf-azurelearn-dev_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"lin_sahrazurelearnadfdev_properties_typeProperties_url": {
+						"value": "[parameters('lin_sahrazurelearnadfdev_properties_typeProperties_url')]"
+					},
+					"ADF_Medallion_Storage_properties_typeProperties_serviceEndpoint": {
+						"value": "[parameters('ADF_Medallion_Storage_properties_typeProperties_serviceEndpoint')]"
+					},
+					"ADF_Batch_Acc_properties_typeProperties_batchUri": {
+						"value": "[parameters('ADF_Batch_Acc_properties_typeProperties_batchUri')]"
+					},
+					"ADF_Batch_Acc_properties_typeProperties_poolName": {
+						"value": "[parameters('ADF_Batch_Acc_properties_typeProperties_poolName')]"
+					},
+					"ADF_Batch_Acc_properties_typeProperties_accountName": {
+						"value": "[parameters('ADF_Batch_Acc_properties_typeProperties_accountName')]"
+					}
+				}
+			},
+			"dependsOn": []
+		}
+	]
+}

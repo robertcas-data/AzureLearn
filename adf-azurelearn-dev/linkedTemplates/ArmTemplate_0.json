@@ -1,0 +1,131 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "adf-azurelearn-dev"
+		},
+		"lin_sahrazurelearnadfdev_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://sahrazurelearnadfdev.dfs.core.windows.net/"
+		},
+		"ADF_Medallion_Storage_properties_typeProperties_serviceEndpoint": {
+			"type": "string",
+			"defaultValue": "https://sahrazurelearnadfdev.blob.core.windows.net/"
+		},
+		"ADF_Batch_Acc_properties_typeProperties_batchUri": {
+			"type": "string",
+			"defaultValue": "https://baazurelearndev.westeurope.batch.azure.com/"
+		},
+		"ADF_Batch_Acc_properties_typeProperties_poolName": {
+			"type": "string",
+			"defaultValue": "custom-activity-pool"
+		},
+		"ADF_Batch_Acc_properties_typeProperties_accountName": {
+			"type": "string",
+			"defaultValue": "baazurelearndev"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/lin_sahrazurelearnadfdev')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobFS",
+				"typeProperties": {
+					"url": "[parameters('lin_sahrazurelearnadfdev_properties_typeProperties_url')]"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ADF_Medallion_Storage')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBlobStorage",
+				"typeProperties": {
+					"serviceEndpoint": "[parameters('ADF_Medallion_Storage_properties_typeProperties_serviceEndpoint')]",
+					"accountKind": "StorageV2"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/ADF_Batch_Acc')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureBatch",
+				"typeProperties": {
+					"batchUri": "[parameters('ADF_Batch_Acc_properties_typeProperties_batchUri')]",
+					"poolName": "[parameters('ADF_Batch_Acc_properties_typeProperties_poolName')]",
+					"accountName": "[parameters('ADF_Batch_Acc_properties_typeProperties_accountName')]",
+					"linkedServiceName": {
+						"referenceName": "ADF_Medallion_Storage",
+						"type": "LinkedServiceReference"
+					}
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ADF_Medallion_Storage')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/scrape_pv_prices')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "python-scrape-pv",
+						"type": "Custom",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"command": "python scrape-pv-prices10.py",
+							"resourceLinkedService": {
+								"referenceName": "ADF_Medallion_Storage",
+								"type": "LinkedServiceReference"
+							},
+							"folderPath": "meta/scripts/python",
+							"referenceObjects": {
+								"linkedServices": [],
+								"datasets": []
+							}
+						},
+						"linkedServiceName": {
+							"referenceName": "ADF_Batch_Acc",
+							"type": "LinkedServiceReference"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/ADF_Batch_Acc')]",
+				"[concat(variables('factoryId'), '/linkedServices/ADF_Medallion_Storage')]"
+			]
+		}
+	]
+}
