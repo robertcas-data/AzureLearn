@@ -45,6 +45,24 @@ resource "azurerm_databricks_workspace" "adb-ws" {
   tags                        = local.tags
 }
 
+resource "azurerm_databricks_access_connector" "adb-con" {
+  name                = "adb-ac-${var.project}-${var.environment}"
+  resource_group_name = azurerm_resource_group.rg-adb.name
+  location            = azurerm_resource_group.rg-adb.location
+
+  identity {
+    type = "SystemAssigned"
+  }
+
+  tags = local.tags
+}
+
+resource "azurerm_role_assignment" "synapse-role-assignment" {
+  scope                = azurerm_storage_account.data-lake.id
+  role_definition_name = "Storage Blob Data Contributor"
+  principal_id         = azurerm_databricks_access_connector.adb-con.identity[0].principal_id
+}
+
 output "databricks_host" {
   value = "https://${azurerm_databricks_workspace.adb-ws.workspace_url}/"
 }
