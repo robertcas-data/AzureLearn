@@ -29,3 +29,8 @@ variable "deploy-datafactory"{
   type = bool
   default = true
 }
+
+variable "deploy-mssql"{
+  type = bool
+  default = true
+}

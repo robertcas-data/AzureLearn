@@ -69,3 +69,13 @@ module "adf-learn" {
   environment = var.environment
   region = var.region
 }
+
+# Create MS SQL Server and DB
+module "mssql-learn" {
+  source = "./modules/mssql"
+  count = var.deploy-mssql == true ? 1 : 0
+  project = var.project
+  sql-deployment-name-short = "msql"
+  environment = var.environment
+  region = var.region
+}
