@@ -10,7 +10,7 @@ variable "region" {
 
 variable "db-sku-name" {
   # docu on sku_name values: https://docs.microsoft.com/en-us/azure/azure-sql/database/resource-limits-vcore-single-databases#general-purpose---serverless-compute---gen5
-  default = "GP_S_Gen5_2"
+  default = "GP_S_Gen5_1"
 }
 
 variable "db-min-capacity" {
@@ -22,7 +22,7 @@ variable "db-max-size-gb" {
 }
 
 variable "db-auto-pause-delay-minutes" {
-  default = -1
+  default = 60
 }
 
 variable "sql-deployment-name-short" {
@@ -72,7 +72,7 @@ output "server" {
 # 2/2 db
 # SQL Server
 ### Resources
-resource "azurerm_mssql_database" "db" {
+resource "azurerm_mssql_database" "serverless-db" {
   name                        = "sql-db-${var.project}-${var.sql-deployment-name-short}-${var.environment}"
   server_id                   = azurerm_mssql_server.server.id
   collation                   = "SQL_Latin1_General_CP1_CI_AS"
@@ -80,18 +80,17 @@ resource "azurerm_mssql_database" "db" {
   min_capacity                = "${var.db-min-capacity}"
   max_size_gb                 = "${var.db-max-size-gb}" 
   auto_pause_delay_in_minutes = "${var.db-auto-pause-delay-minutes}" 
-  zone_redundant              = true
-  short_term_retention_policy {
-    retention_days    = 35
-  }
-  long_term_retention_policy {
-    week_of_year      = 1
-    weekly_retention  = "PT0S"
-    monthly_retention = "PT0S"
-    yearly_retention  = "PT0S"  
-  }
+  zone_redundant              = false
   tags                        = local.tags
+
+  threat_detection_policy {
+    disabled_alerts      = []
+    email_account_admins = "Disabled"
+    email_addresses      = []
+    retention_days       = 0
+    state                = "Disabled"
+  }
 }
-output "db" {
-  value = azurerm_mssql_database.db
+output "serverless-db" {
+  value = azurerm_mssql_database.serverless-db
 }
