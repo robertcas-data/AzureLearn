@@ -18,7 +18,7 @@ variable "db-min-capacity" {
 }
 
 variable "db-max-size-gb" {
-  default = 32
+  default = 16
 }
 
 variable "db-auto-pause-delay-minutes" {
@@ -52,12 +52,12 @@ resource "azurerm_resource_group" "rg-mssql" {
 # server + db
 # 1/2 server
 resource "azurerm_mssql_server" "server" {
-  name                            = "sql-server-${var.project}-${var.sql-deployment-name-short}-${var.environment}"
+  name                            = "sql-server-${var.project}-${var.environment}"
   resource_group_name             = azurerm_resource_group.rg-mssql.name
   location                        = azurerm_resource_group.rg-mssql.location
   version                         = "12.0"
   minimum_tls_version             = "1.2"
-  public_network_access_enabled   = false
+  public_network_access_enabled   = true
   azuread_administrator {
     azuread_authentication_only   = true
     login_username                = "AzureAD Admin"
@@ -73,7 +73,7 @@ output "server" {
 # SQL Server
 ### Resources
 resource "azurerm_mssql_database" "serverless-db" {
-  name                        = "sql-db-${var.project}-${var.sql-deployment-name-short}-${var.environment}"
+  name                        = "sql-db-${var.project}-${var.environment}"
   server_id                   = azurerm_mssql_server.server.id
   collation                   = "SQL_Latin1_General_CP1_CI_AS"
   sku_name                    = "${var.db-sku-name}" 
@@ -82,6 +82,7 @@ resource "azurerm_mssql_database" "serverless-db" {
   auto_pause_delay_in_minutes = "${var.db-auto-pause-delay-minutes}" 
   zone_redundant              = false
   tags                        = local.tags
+  storage_account_type        = "Local"
 
   threat_detection_policy {
     disabled_alerts      = []
